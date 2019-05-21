@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exam.mapper.BoardMapper">
+
+	<select id="getSeqBoardNum" resultType="int">
+		select seq_board.nextval from dual
+	</select>
+
+	<insert id="insertBoard">
+		<!-- 
+		<selectKey order="BEFORE" resultType="int" keyProperty="num">
+			select seq_board.nextval from dual
+		</selectKey>
+		 -->
+		INSERT INTO board (num, name, pass, subject, content, filename, re_ref, re_lev, re_seq, readcount, ip, reg_date) 
+		VALUES (#{num}, #{name}, #{pass}, #{subject}, #{content}, #{filename}, #{reRef}, #{reLev}, #{reSeq}, #{readcount}, #{ip}, CURRENT_TIMESTAMP)
+	</insert>
+	
+	
+	<select id="getBoards" resultType="boardVO">
+		SELECT * 
+		FROM
+		    (SELECT ROWNUM AS rn, a.* 
+		    FROM
+		        (SELECT * 
+		        FROM board
+		        <where>
+					<if test="search != null and search != ''">
+						subject LIKE '%' || #{search} || '%' 
+					</if>
+				</where>
+				<![CDATA[
+		        ORDER BY re_ref DESC, re_seq ASC) a
+		    WHERE ROWNUM <= #{pageNum} * #{amount}) a
+		WHERE a.rn > (#{pageNum} - 1) * #{amount}
+ 		]]>
+	</select>
+	
+	
+	<select id="getBoardCount" resultType="int">
+		SELECT COUNT(*) 
+		FROM board
+		<where>
+			<if test="search != null and search != ''">
+				subject LIKE '%' || #{search} || '%' 
+			</if>
+		</where>
+	</select>
+	
+	<update id="updateReadcount">
+		UPDATE board 
+		SET readcount = readcount+1 
+		WHERE num = #{num}
+	</update>
+	
+	<select id="getBoard" resultType="boardVO">
+		SELECT * FROM board WHERE num = #{num}
+	</select>
+	
+	<update id="updateBoard">
+		UPDATE board 
+		SET name=#{name}, subject=#{subject}, content=#{content}, filename=#{filename} 
+		WHERE num=#{num} 
+	</update>
+	
+	<delete id="deleteBoard">
+		DELETE FROM board WHERE num = #{num}
+	</delete>
+	
+	<update id="updateReplyGroupSeq">
+		UPDATE board 
+		SET re_seq = re_seq + 1 
+		WHERE re_ref = #{reRef} 
+		AND re_seq > #{reSeq} 
+	</update>
+	
+</mapper>
+
+
+
+
+

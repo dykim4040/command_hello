@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exam.mapper.AttachMapper">
+
+	<insert id="insert">
+		INSERT INTO attach (uuid, uploadpath, filename, filetype, bnum)
+		VALUES (#{uuid}, #{uploadpath}, #{filename}, #{filetype}, #{bnum})
+	</insert>
+
+	<delete id="delete">
+		DELETE FROM attach WHERE uuid = #{uuid}
+	</delete>
+	
+	<delete id="deleteByBoardNum">
+		DELETE FROM attach WHERE bnum = #{bnum}
+	</delete>
+
+	<select id="findByBnum" resultType="attachVO">
+		SELECT * FROM attach WHERE bnum = #{bnum}
+	</select>
+
+
+</mapper>
